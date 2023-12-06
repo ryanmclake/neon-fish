@@ -7,8 +7,11 @@ gc()
 if (!"pacman" %in% installed.packages()) install.packages("pacman")
 pacman::p_load(tidyverse, neonstore)
 
-# Get the newest NEON fish data
-source("~/R/neon-fish/download/download_fish_data.R")
+# generate a data frame of all tables that were downloaded
+table_index <- neonstore::neon_index(product="DP1.20107.001")
+
+# collect the specific table names needed when using neon_read function
+table_names <- unique(table_index$table) %>% str_subset(pattern = "-basic")
 
 # Identify the lakes
 lakes <- c("CRAM","LIRO","PRLO","PRLA","SUGG","BARC","TOOK")
@@ -16,15 +19,13 @@ lakes <- c("CRAM","LIRO","PRLO","PRLA","SUGG","BARC","TOOK")
 # Identify the streams
 streams <- c()
 
-# Identify the rivers
-rivers <- c()
-
 
 lake_fish_bulkCount <- neonstore::neon_read(table = table_names[1], site = lakes) %>%
-  filter(siteID == "PRLA")
+  dplyr::filter(siteID == "PRLA") %>%
+  dplyr::filter(str_detect(eventID, "fyke"))
 
-ggplot(lake_fish_bulkCount, aes(passEndTime, bulkFishCount))+
-  geom_point()
+ggplot(lake_fish_bulkCount, aes(passEndTime, bulkFishCount, color = as.character(passNumber)))+
+  geom_point(size = 3)
 
 summary(lake_fish_bulkCount)
 

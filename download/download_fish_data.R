@@ -22,9 +22,3 @@ neonstore::neon_download(product="DP1.20107.001")
 
 # store downloaded data in the above specified environment
 neonstore::neon_store(product="DP1.20107.001")
-
-# generate a data frame of all tables that were downloaded
-table_index <- neonstore::neon_index(product="DP1.20107.001")
-
-# collect the specific table names needed when using neon_read function
-table_names <- unique(table_index$table) %>% str_subset(pattern = "-basic")
